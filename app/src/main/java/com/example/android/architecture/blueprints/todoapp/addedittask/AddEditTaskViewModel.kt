@@ -20,9 +20,11 @@ import android.app.Application
 import androidx.lifecycle.*
 import com.example.android.architecture.blueprints.todoapp.Event
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoApplication
 import com.example.android.architecture.blueprints.todoapp.data.Result.Success
 import com.example.android.architecture.blueprints.todoapp.data.Task
 import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.launch
 
 /**
@@ -32,7 +34,8 @@ class AddEditTaskViewModel(application: Application) : AndroidViewModel(applicat
 
     // Note, for testing and architecture purposes, it's bad practice to construct the repository
     // here. We'll show you how to fix this during the codelab
-    private val tasksRepository = DefaultTasksRepository.getRepository(application)
+    @InternalCoroutinesApi
+    private val tasksRepository = (application as TodoApplication).taskRepository
 
     // Two-way databinding, exposing MutableLiveData
     val title = MutableLiveData<String>()
@@ -57,6 +60,7 @@ class AddEditTaskViewModel(application: Application) : AndroidViewModel(applicat
 
     private var taskCompleted = false
 
+    @InternalCoroutinesApi
     fun start(taskId: String?) {
         if (_dataLoading.value == true) {
             return
@@ -100,6 +104,7 @@ class AddEditTaskViewModel(application: Application) : AndroidViewModel(applicat
     }
 
     // Called when clicking on fab.
+    @InternalCoroutinesApi
     fun saveTask() {
         val currentTitle = title.value
         val currentDescription = description.value
@@ -122,11 +127,13 @@ class AddEditTaskViewModel(application: Application) : AndroidViewModel(applicat
         }
     }
 
+    @InternalCoroutinesApi
     private fun createTask(newTask: Task) = viewModelScope.launch {
         tasksRepository.saveTask(newTask)
         _taskUpdatedEvent.value = Event(Unit)
     }
 
+    @InternalCoroutinesApi
     private fun updateTask(task: Task) {
         if (isNewTask) {
             throw RuntimeException("updateTask() was called but task is new.")

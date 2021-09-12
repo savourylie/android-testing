@@ -28,11 +28,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoApplication
+import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.databinding.TaskdetailFragBinding
 import com.example.android.architecture.blueprints.todoapp.tasks.DELETE_RESULT_OK
+import com.example.android.architecture.blueprints.todoapp.tasks.TasksViewModel
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.InternalCoroutinesApi
 
 /**
  * Main UI for the task detail screen.
@@ -42,8 +46,12 @@ class TaskDetailFragment : Fragment() {
 
     private val args: TaskDetailFragmentArgs by navArgs()
 
-    private val viewModel by viewModels<TaskDetailViewModel>()
+    @InternalCoroutinesApi
+    private val viewModel by viewModels<TaskDetailViewModel> {
+        TaskDetailViewModel.TaskDetailViewModelFactory((requireContext().applicationContext as TodoApplication).taskRepository)
+    }
 
+    @InternalCoroutinesApi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupFab()
@@ -52,6 +60,7 @@ class TaskDetailFragment : Fragment() {
         this.setupRefreshLayout(viewDataBinding.refreshLayout)
     }
 
+    @InternalCoroutinesApi
     private fun setupNavigation() {
         viewModel.deleteTaskEvent.observe(this, EventObserver {
             val action = TaskDetailFragmentDirections
@@ -68,12 +77,14 @@ class TaskDetailFragment : Fragment() {
         })
     }
 
+    @InternalCoroutinesApi
     private fun setupFab() {
         activity?.findViewById<View>(R.id.edit_task_fab)?.setOnClickListener {
             viewModel.editTask()
         }
     }
 
+    @InternalCoroutinesApi
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -91,6 +102,7 @@ class TaskDetailFragment : Fragment() {
         return view
     }
 
+    @InternalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.menu_delete -> {

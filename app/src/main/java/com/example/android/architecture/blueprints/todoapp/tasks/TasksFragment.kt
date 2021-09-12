@@ -30,12 +30,15 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.example.android.architecture.blueprints.todoapp.EventObserver
 import com.example.android.architecture.blueprints.todoapp.R
+import com.example.android.architecture.blueprints.todoapp.TodoApplication
 import com.example.android.architecture.blueprints.todoapp.data.Task
+import com.example.android.architecture.blueprints.todoapp.data.source.DefaultTasksRepository
 import com.example.android.architecture.blueprints.todoapp.databinding.TasksFragBinding
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.InternalCoroutinesApi
 import timber.log.Timber
 
 /**
@@ -43,7 +46,10 @@ import timber.log.Timber
  */
 class TasksFragment : Fragment() {
 
-    private val viewModel by viewModels<TasksViewModel>()
+    @InternalCoroutinesApi
+    private val viewModel by viewModels<TasksViewModel> {
+        TasksViewModel.TasksViewModelFactory((requireContext().applicationContext as TodoApplication).taskRepository)
+    }
 
     private val args: TasksFragmentArgs by navArgs()
 
@@ -51,6 +57,7 @@ class TasksFragment : Fragment() {
 
     private lateinit var listAdapter: TasksAdapter
 
+    @InternalCoroutinesApi
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -62,6 +69,7 @@ class TasksFragment : Fragment() {
         return viewDataBinding.root
     }
 
+    @InternalCoroutinesApi
     override fun onOptionsItemSelected(item: MenuItem) =
         when (item.itemId) {
             R.id.menu_clear -> {
@@ -83,6 +91,7 @@ class TasksFragment : Fragment() {
         inflater.inflate(R.menu.tasks_fragment_menu, menu)
     }
 
+    @InternalCoroutinesApi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
@@ -95,6 +104,7 @@ class TasksFragment : Fragment() {
         setupFab()
     }
 
+    @InternalCoroutinesApi
     private fun setupNavigation() {
         viewModel.openTaskEvent.observe(this, EventObserver {
             openTaskDetails(it)
@@ -104,6 +114,7 @@ class TasksFragment : Fragment() {
         })
     }
 
+    @InternalCoroutinesApi
     private fun setupSnackbar() {
         view?.setupSnackbar(this, viewModel.snackbarText, Snackbar.LENGTH_SHORT)
         arguments?.let {
@@ -111,6 +122,7 @@ class TasksFragment : Fragment() {
         }
     }
 
+    @InternalCoroutinesApi
     private fun showFilteringPopUpMenu() {
         val view = activity?.findViewById<View>(R.id.menu_filter) ?: return
         PopupMenu(requireContext(), view).run {

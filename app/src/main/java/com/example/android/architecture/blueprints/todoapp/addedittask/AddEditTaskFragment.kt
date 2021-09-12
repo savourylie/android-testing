@@ -30,6 +30,7 @@ import com.example.android.architecture.blueprints.todoapp.tasks.ADD_EDIT_RESULT
 import com.example.android.architecture.blueprints.todoapp.util.setupRefreshLayout
 import com.example.android.architecture.blueprints.todoapp.util.setupSnackbar
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.InternalCoroutinesApi
 
 /**
  * Main UI for the add task screen. Users can enter a task title and description.
@@ -55,6 +56,7 @@ class AddEditTaskFragment : Fragment() {
         return viewDataBinding.root
     }
 
+    @InternalCoroutinesApi
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         setupSnackbar()
